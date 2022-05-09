@@ -27,11 +27,12 @@ switch ($_POST['action']){
         $city       = addslashes($_POST['city']);
 
 
-        $dbpdo->insert("INSERT INTO users_tbl (`username`,`password`,`role`,`user_title`,`name`,`surname`,`email`,`address`,`postcode`,`city`) VALUES ('$username',MD5('$password'),'$role','$user_title','$name','$surname','$email','$address','$postcode','$city')");
+        $dbpdo->insert("INSERT INTO users_tbl (`username`,`password`,`role`,`user_title`,`name`,`surname`,`email`,`address`,`postcode`,`city`) VALUES ('$username',SHA2('$password', 256),'$role','$user_title','$name','$surname','$email','$address','$postcode','$city')");
         break;
 
     case 'editUser':
         //Case for editing users
+        $id         = $_POST['id'];
 
         $username   = $_POST['username'];
         $password   = $_POST['password'];
@@ -44,7 +45,7 @@ switch ($_POST['action']){
         $postcode   = $_POST['postcode'];
         $city       = $_POST['city'];
 
-        $dbpdo->insert("UPDATE users_tbl SET `username`='$username',`password`=MD5('$password'),`role`='$role',`user_title`='$user_title',`name`='$name',`surname`='$surname',`email`='$email',`address`='$address',`postcode`='$postcode',`city`='$city'");
+        $dbpdo->update("UPDATE users_tbl SET `username`='$username',`password`=SHA2('$password', 256),`role`='$role',`user_title`='$user_title',`name`='$name',`surname`='$surname',`email`='$email',`address`='$address',`postcode`='$postcode',`city`='$city' WHERE users_tbl.id = '{$id}'");
 
         break;
 

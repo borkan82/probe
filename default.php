@@ -100,7 +100,7 @@ $allUsers = $dbpdo->fetch("SELECT users_tbl.*, roles_tbl.name AS roleName FROM u
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" id="addUserButton" class="btn btn-success" style="float: left;" onclick="addUser();"  >Add User</button>
+                    <button type="button" id="addUserButton" class="btn btn-success" style="float: left;" onclick="addUser();"  >Hinzufügen</button>
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                 </div>
             </div>
@@ -117,11 +117,12 @@ $allUsers = $dbpdo->fetch("SELECT users_tbl.*, roles_tbl.name AS roleName FROM u
                     </button>
                 </div>
                 <div class="modal-body" style="height: 420px;">
+                    <input type="hidden" id="user_id" value="">
                     <input class="form-control" style="float: left;margin-right:3px;width:80%;margin-bottom: 5px;" type="text" id="username_edit" value="">
                     <div style="clear:both;"></div>
                     <input class="form-control" style="float: left;margin-right:3px;width:80%;margin-bottom: 5px;" type="text" id="password_edit" type="password" value="">
                     <div style="clear:both;"></div>
-                    <select class="form-control" id="role" style="float: left;margin-right:3px;width:80%;margin-bottom: 5px;">
+                    <select class="form-control" id="role_edit" style="float: left;margin-right:3px;width:80%;margin-bottom: 5px;">
                         <option value="1">Admin</option>
                         <option value="2">Redakteur</option>
                         <option value="3">Gast</option>
@@ -143,7 +144,7 @@ $allUsers = $dbpdo->fetch("SELECT users_tbl.*, roles_tbl.name AS roleName FROM u
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" id="addUserButton" class="btn btn-success" style="float: left;" onclick="addUser();"  >Add User</button>
+                    <button type="button" id="addUserButton" class="btn btn-success" style="float: left;" onclick="editUser();"  >Bearbeiten</button>
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                 </div>
             </div>
@@ -151,6 +152,10 @@ $allUsers = $dbpdo->fetch("SELECT users_tbl.*, roles_tbl.name AS roleName FROM u
     </div>
 </div>
 <script>
+    /**
+     * Function for adding new users
+     * @returns {boolean}
+     */
     function addUser () {
         var dataSend        = {};
         dataSend['action']  = "addUser";
@@ -179,11 +184,16 @@ $allUsers = $dbpdo->fetch("SELECT users_tbl.*, roles_tbl.name AS roleName FROM u
             success: function(data){
                 alert("Der Benutzer wurde der Datenbank hinzugefügt!");
                 $("#createUserModal").hide();
+                $('.modal-backdrop').hide();
             }
         });
         return false;
     }
 
+    /**
+     * Function for user Edit
+     * @returns {boolean}
+     */
     function editUser () {
         var dataSend        = {};
         dataSend['action']  = "editUser";
@@ -191,6 +201,7 @@ $allUsers = $dbpdo->fetch("SELECT users_tbl.*, roles_tbl.name AS roleName FROM u
          * Get variables for all user data
          */
 
+        dataSend['id']          = $('#user_id').val();
         dataSend['username']    = $('#username_edit').val();
         dataSend['password']    = $('#password_edit').val();
         dataSend['role']        = $('#role_edit').val();
@@ -211,11 +222,17 @@ $allUsers = $dbpdo->fetch("SELECT users_tbl.*, roles_tbl.name AS roleName FROM u
             success: function(data){
                 alert("Benutzerdaten wurden geändert!");
                 $("#editUserModal").hide();
+                $('.modal-backdrop').hide();
             }
         });
         return false;
     }
 
+    /**
+     * Function for getting user data for edit
+     * @param user_id
+     * @returns {boolean}
+     */
     function getUserData(user_id){
         var dataSend        = {};
         dataSend['action']  = "getUser";
@@ -229,39 +246,40 @@ $allUsers = $dbpdo->fetch("SELECT users_tbl.*, roles_tbl.name AS roleName FROM u
             dataType: 'json',
             cache: false,
             success: function(data){
-console.log(data[0]);
-                if(data[0].length > 0){
-                    console.log(data[0]);
-                    console.log(data[0].username);
 
+                if(data.length > 0){
+                    $('#user_id').val(data[0].id);
                     $('#username_edit').val(data[0].username);
-                    // $('#password_edit').val();
-                    // $('#role_edit').val();
-                    // $('#user_title_edit').val();
-                    // $('#name_edit').val();
-                    // $('#surname_edit').val();
-                    // $('#email_edit').val();
-                    // $('#address_edit').val();
-                    // $('#postcode_edit').val();
-                    // $('#city_edit').val();
+                    $('#password_edit').val(data[0].password);
+                    $('#role_edit').val(data[0].role);
+                    $('#user_title_edit').val(data[0].user_title);
+                    $('#name_edit').val(data[0].name);
+                    $('#surname_edit').val(data[0].surname);
+                    $('#email_edit').val(data[0].email);
+                    $('#address_edit').val(data[0].address);
+                    $('#postcode_edit').val(data[0].postcode);
+                    $('#city_edit').val(data[0].city);
                 }
             }
         });
         return false;
     }
 
+    /**
+     * Function for deleting user data
+     * @param user_id
+     * @returns {boolean}
+     */
     function deleteUser(user_id){
         var dataSend        = {};
         dataSend['action']  = "deleteUser";
-        dataSend['id']  = "deleteUser";
+        dataSend['id']  = user_id;
 
         $.ajax
         ({
             type: "POST",
             url: "ajax.php",
             data: dataSend,
-            dataType: 'json',
-            async: false,
             cache: false,
             success: function(data){
                 alert('Benutzer gelöscht!');
