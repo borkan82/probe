@@ -9,16 +9,16 @@
 include_once("DbPDO.php");
 class USERS extends DbPDO
 {
-
     /**
      * Function to fetch all rows from datatable
      * @return array
      */
     public function getUsers(){
-        $sql = "SELECT users_tbl.*, roles_tbl.name AS roleName, anrede_tbl.name AS user_title  FROM users_tbl 
-                            LEFT JOIN roles_tbl ON users_tbl.role = roles_tbl.id 
-                            LEFT JOIN anrede_tbl ON users_tbl.user_title = anrede_tbl.id 
-                            WHERE 1";
+        $sql = "SELECT users_tbl.*, roles_tbl.name AS roleName, anrede_tbl.name AS user_title  
+                    FROM users_tbl 
+                    LEFT JOIN roles_tbl ON users_tbl.role = roles_tbl.id 
+                    LEFT JOIN anrede_tbl ON users_tbl.user_title = anrede_tbl.id 
+                    WHERE 1";
         $result = $this->fetch($sql);
 
         return $result;
@@ -36,6 +36,7 @@ class USERS extends DbPDO
     }
 
     /**
+     * Insert new user to database
      * @param $_data
      * @return bool|string
      */
@@ -52,12 +53,15 @@ class USERS extends DbPDO
         $postcode   = addslashes($_data['postcode']);
         $city       = addslashes($_data['city']);
 
+        $sql = "INSERT INTO users_tbl (`username`,`password`,`role`,`user_title`,`name`,`surname`,`email`,`address`,`postcode`,`city`) 
+                                VALUES ('$username',SHA2('$password', 256),'$role','$user_title','$name','$surname','$email','$address','$postcode','$city')";
 
-        return $this->insert("INSERT INTO users_tbl (`username`,`password`,`role`,`user_title`,`name`,`surname`,`email`,`address`,`postcode`,`city`) VALUES ('$username',SHA2('$password', 256),'$role','$user_title','$name','$surname','$email','$address','$postcode','$city')");
+        return $this->insert($sql);
 
     }
 
     /**
+     * Delete user from database
      * @param $id
      * @return bool
      */
@@ -67,6 +71,7 @@ class USERS extends DbPDO
     }
 
     /**
+     * Update existing user
      * @param $_data
      * @return bool
      */
@@ -84,7 +89,20 @@ class USERS extends DbPDO
         $postcode   = $_data['postcode'];
         $city       = $_data['city'];
 
-        return $this->update("UPDATE users_tbl SET `username`='$username',`password`=SHA2('$password', 256),`role`='$role',`user_title`='$user_title',`name`='$name',`surname`='$surname',`email`='$email',`address`='$address',`postcode`='$postcode',`city`='$city' WHERE users_tbl.id = '{$id}'");
+        $sql = "UPDATE users_tbl SET 
+                     `username`='$username',
+                     `password`=SHA2('$password', 256),
+                     `role`='$role',
+                     `user_title`='$user_title',
+                     `name`='$name',
+                     `surname`='$surname',
+                     `email`='$email',
+                     `address`='$address',
+                     `postcode`='$postcode',
+                     `city`='$city' 
+                WHERE users_tbl.id = '{$id}'";
+
+        return $this->update($sql);
     }
 
 }

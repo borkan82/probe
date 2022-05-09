@@ -1,5 +1,4 @@
 <?php
-include "include/config.php";
 include "class/class.Users.php";
 
 $_users     = new USERS();
@@ -46,9 +45,11 @@ $allUsers   = $_users->getUsers();
         </thead>
         <tbody>
         <?php
+        $count = 0;
         foreach($allUsers AS $row){
+            $count++;
             echo "<tr>";
-                echo '<th scope="row">'.$row['id'].'</th>';
+                echo '<th scope="row">'.$count.'</th>';
                 echo '<td>'.$row['username'].'</td>';
                 echo '<td>'.$row['roleName'].'</td>';
                 echo '<td>'.$row['user_title'].'</td>';

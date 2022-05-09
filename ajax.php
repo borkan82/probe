@@ -6,12 +6,9 @@
  * Time: 10:47
  */
 
-include "include/config.php";
-//include INC."DbPDO.php";
 include "class/class.Users.php";
 
 $_users = new USERS();
-//$dbpdo = new DbPDO();
 
 switch ($_POST['action']){
 
