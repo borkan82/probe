@@ -1,12 +1,10 @@
 <?php
 include "include/config.php";
-include INC."DbPDO.php";
-$dbpdo = new DbPDO();
-$allUsers = $dbpdo->fetch("SELECT users_tbl.*, roles_tbl.name AS roleName FROM users_tbl 
-                            LEFT JOIN roles_tbl ON users_tbl.role = roles_tbl.id 
-                            WHERE 1");
-?>
+include "class/class.Users.php";
 
+$_users     = new USERS();
+$allUsers   = $_users->getUsers();
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -20,7 +18,11 @@ $allUsers = $dbpdo->fetch("SELECT users_tbl.*, roles_tbl.name AS roleName FROM u
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </head>
-
+<style>
+    .container {
+        width: 1600px!important;
+    }
+</style>
 <body>
 
 <div class="container">
@@ -84,7 +86,11 @@ $allUsers = $dbpdo->fetch("SELECT users_tbl.*, roles_tbl.name AS roleName FROM u
                         <option value="3">Gast</option>
                     </select>
                     <div style="clear:both;"></div>
-                    <input class="form-control" style="float: left;margin-right:3px;width:80%;margin-bottom: 5px;" type="text" id="user_title" value="" placeholder="Anrede">
+                    <select class="form-control" id="user_title" style="float: left;margin-right:3px;width:80%;margin-bottom: 5px;">
+                        <option value="1">Herr</option>
+                        <option value="2">Frau</option>
+                        <option value="3">Keine</option>
+                    </select>
                     <div style="clear:both;"></div>
                     <input class="form-control" style="float: left;margin-right:3px;width:80%;margin-bottom: 5px;" type="text" id="name" value="" placeholder="Vorname">
                     <div style="clear:both;"></div>
@@ -128,7 +134,11 @@ $allUsers = $dbpdo->fetch("SELECT users_tbl.*, roles_tbl.name AS roleName FROM u
                         <option value="3">Gast</option>
                     </select>
                     <div style="clear:both;"></div>
-                    <input class="form-control" style="float: left;margin-right:3px;width:80%;margin-bottom: 5px;" type="text" id="user_title_edit" value="">
+                    <select class="form-control" id="user_title_edit" style="float: left;margin-right:3px;width:80%;margin-bottom: 5px;">
+                        <option value="1">Herr</option>
+                        <option value="2">Frau</option>
+                        <option value="3">Keine</option>
+                    </select>
                     <div style="clear:both;"></div>
                     <input class="form-control" style="float: left;margin-right:3px;width:80%;margin-bottom: 5px;" type="text" id="name_edit" value="">
                     <div style="clear:both;"></div>
@@ -144,150 +154,14 @@ $allUsers = $dbpdo->fetch("SELECT users_tbl.*, roles_tbl.name AS roleName FROM u
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" id="addUserButton" class="btn btn-success" style="float: left;" onclick="editUser();"  >Bearbeiten</button>
+                    <button type="button" id="addUserButton" class="btn btn-success" style="float: left;" onclick="editUser();" >Bearbeiten</button>
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
     </div>
 </div>
-<script>
-    /**
-     * Function for adding new users
-     * @returns {boolean}
-     */
-    function addUser () {
-        var dataSend        = {};
-        dataSend['action']  = "addUser";
-
-        /**
-         * Get variables for all user data
-         */
-
-        dataSend['username']    = $('#username').val();
-        dataSend['password']    = $('#password').val();
-        dataSend['role']        = $('#role').val();
-        dataSend['user_title']  = $('#user_title').val();
-        dataSend['name']        = $('#name').val();
-        dataSend['surname']     = $('#surname').val();
-        dataSend['email']       = $('#email').val();
-        dataSend['address']     = $('#address').val();
-        dataSend['postcode']    = $('#postcode').val();
-        dataSend['city']        = $('#city').val();
-
-        $.ajax
-        ({
-            type: "POST",
-            url: "ajax.php",
-            data: dataSend,
-            cache: false,
-            success: function(data){
-                alert("Der Benutzer wurde der Datenbank hinzugefügt!");
-                $("#createUserModal").hide();
-                $('.modal-backdrop').hide();
-            }
-        });
-        return false;
-    }
-
-    /**
-     * Function for user Edit
-     * @returns {boolean}
-     */
-    function editUser () {
-        var dataSend        = {};
-        dataSend['action']  = "editUser";
-        /**
-         * Get variables for all user data
-         */
-
-        dataSend['id']          = $('#user_id').val();
-        dataSend['username']    = $('#username_edit').val();
-        dataSend['password']    = $('#password_edit').val();
-        dataSend['role']        = $('#role_edit').val();
-        dataSend['user_title']  = $('#user_title_edit').val();
-        dataSend['name']        = $('#name_edit').val();
-        dataSend['surname']     = $('#surname_edit').val();
-        dataSend['email']       = $('#email_edit').val();
-        dataSend['address']     = $('#address_edit').val();
-        dataSend['postcode']    = $('#postcode_edit').val();
-        dataSend['city']        = $('#city_edit').val();
-
-        $.ajax
-        ({
-            type: "POST",
-            url: "ajax.php",
-            data: dataSend,
-            cache: false,
-            success: function(data){
-                alert("Benutzerdaten wurden geändert!");
-                $("#editUserModal").hide();
-                $('.modal-backdrop').hide();
-            }
-        });
-        return false;
-    }
-
-    /**
-     * Function for getting user data for edit
-     * @param user_id
-     * @returns {boolean}
-     */
-    function getUserData(user_id){
-        var dataSend        = {};
-        dataSend['action']  = "getUser";
-        dataSend['id']  = user_id;
-
-        $.ajax
-        ({
-            type: "POST",
-            url: "ajax.php",
-            data: dataSend,
-            dataType: 'json',
-            cache: false,
-            success: function(data){
-
-                if(data.length > 0){
-                    $('#user_id').val(data[0].id);
-                    $('#username_edit').val(data[0].username);
-                    $('#password_edit').val(data[0].password);
-                    $('#role_edit').val(data[0].role);
-                    $('#user_title_edit').val(data[0].user_title);
-                    $('#name_edit').val(data[0].name);
-                    $('#surname_edit').val(data[0].surname);
-                    $('#email_edit').val(data[0].email);
-                    $('#address_edit').val(data[0].address);
-                    $('#postcode_edit').val(data[0].postcode);
-                    $('#city_edit').val(data[0].city);
-                }
-            }
-        });
-        return false;
-    }
-
-    /**
-     * Function for deleting user data
-     * @param user_id
-     * @returns {boolean}
-     */
-    function deleteUser(user_id){
-        var dataSend        = {};
-        dataSend['action']  = "deleteUser";
-        dataSend['id']  = user_id;
-
-        $.ajax
-        ({
-            type: "POST",
-            url: "ajax.php",
-            data: dataSend,
-            cache: false,
-            success: function(data){
-                alert('Benutzer gelöscht!');
-            }
-        });
-        return false;
-    }
-</script>
+<script src="_js/probe.js"></script>
 </body>
 
 </html>

@@ -5,10 +5,32 @@
  * Date: 10-Dec-20
  * Time: 2:14 PM
  */
-include_once("DbParams.php");
 
-class DbPDO extends DbParams
+class DbPDO
 {
+
+    private $hostname = '127.0.0.1';
+    private $username = 'root';
+    private $password = '';
+    private $dbName   = 'arbeitsprobe_db';
+
+    private $conn;
+
+    public function __construct()
+    {
+
+        try {
+            $this->conn = new PDO("mysql:host={$this->hostname};dbname=$this->dbName;charset=utf8", $this->username, $this->password);
+            $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        } catch (PDOException $exc) {
+            die("Connection error: " . $exc->getMessage());
+        }
+    }
+
+    public function getConnection()
+    {
+        return $this->conn;
+    }
 
     /**
      * @param $query
